@@ -62,8 +62,16 @@ for ticker in tickers:
     # Update the cleaned_data dataframe with the spikes values
     cleaned_data.loc[cleaned_data['ticker'] == ticker, 'spikes'] = ticker_data['spikes']
 
+
+# Save the cleaned data to a new csv file
+cleaned_data.to_csv('stock_data_full_clean.csv')
+
+
 # Filter out the rows with spikes from the cleaned_data dataframe
 spike_data = cleaned_data.dropna(subset=['spikes'])
+
+
+
 
 # Calculate the number of spikes, the average, and the highest
 num_spikes = spike_data['spikes'].count()
@@ -76,4 +84,4 @@ print("Highest spike:", highest_spike)
 
 
 # Save the spike data to a new csv file
-spike_data.to_csv('spike_data.csv')
+# spike_data.to_csv('spike_data.csv')
