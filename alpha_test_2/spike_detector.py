@@ -8,7 +8,7 @@ csv_files = sorted(csv_files, key=lambda x: os.path.getmtime(os.path.join(dir_pa
 spikes_count = {}
 top_spikes = []
 
-for filename in csv_files:
+for filename in reversed(csv_files):
     file_path = os.path.join(dir_path, filename)
     
     try:
@@ -26,7 +26,7 @@ for filename in csv_files:
         df['percent_change'] = pd.to_numeric(df['close'], errors='coerce').pct_change() * 100
         
         # Find spikes where the percent change is greater than or equal to 25%
-        df['spike'] = df['percent_change'] >= 20
+        df['spike'] = df['percent_change'] >= 25
         
         # Calculate the cumulative percent change for each spike
         spike_indices = df[df['spike']].index
@@ -44,7 +44,7 @@ for filename in csv_files:
         
         # Count the total number of spikes for the ticker
         total_spikes = df['spike'].sum()
-        spikes_count[ticker] = total_spikes
+        spikes_count[ticker] = spikes_count.get(ticker, 0) + total_spikes
         
         # Find the highest top 5 percentage spikes
         top_spike_percentages = df.loc[df['spike'], 'percent_change'].nlargest(25)
@@ -55,10 +55,12 @@ for filename in csv_files:
         print(f"Skipping file: {filename} - 'time' column not found")
 
 # Count the total number of spikes overall
-total_spikes_overall = sum(total_spikes for _, total_spikes in spikes_count.items())
+total_spikes_overall = sum(spikes_count.values())
+
+# Print the total number of spikes overall
 print(f"Total Spikes Overall: {total_spikes_overall}")
 
 # Print the highest top 5 percentage spikes
-print("Top 5 Percentage Spikes:")
+print("Top 25 Percentage Spikes:")
 for i, spike_percentage in enumerate(sorted(top_spikes, reverse=True)[:25], 1):
     print(f"Rank {i}: {spike_percentage}%")
